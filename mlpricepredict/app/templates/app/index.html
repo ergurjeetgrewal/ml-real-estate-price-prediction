@@ -1,0 +1,124 @@
+{% extends 'app/base.html' %}
+{% block body %}
+<div class="container-fluid">
+    <h3 class="text-dark mb-1">XYZ Real Estate Propert Price Predictor</h3>
+</div>
+<div class="container mt-2 p-5">
+    <form method="post" action="#" id="submitinfo">
+        {% csrf_token %}
+        <div class="row g-0">
+            <div class="col-6 col-md-2 m-1">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="CRIM" name="CRIM" placeholder="Crime Rate">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="ZN" name="ZN" placeholder="residential land">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="INDUS" name="INDUS" placeholder="non-retail business">
+                </div>
+            </div>
+            <div class="col-6 col-md-2 m-1">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="NOX" name="NOX"
+                        placeholder="nitric oxides concentration">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="RM" name="RM" placeholder="number of rooms">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="AGE" name="AGE" placeholder="Age: prior to 1940">
+                </div>
+            </div>
+            <div class="col-6 col-md-2 m-1">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="DIS" name="DIS"
+                        placeholder="distances to five Boston employment">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="RAD" name="RAD" placeholder="radial highways">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">$</span>
+                    <input type="text" class="form-control" placeholder="tax" id="TAX" name="TAX"
+                        aria-label="Amount (to the nearest dollar)">
+                    <span class="input-group-text">.00</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-2 m-1">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="PTRATIO" name="PTRATIO"
+                        placeholder="pupil-teacher ratio">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="B" name="B" placeholder="blacks by town">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="LSTAT" name="LSTAT"
+                        placeholder="status of the population">
+                </div>
+            </div>
+        </div>
+        <div class="form-check form-switch mb-3 m-1 toggle-btn">
+            <label class="form-check-label" for="flexSwitchCheckChecked">River Front</label>
+            <input class="form-check-input cb-value" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                name="CHAS" checked>
+        </div>
+        <button class="btn btn-primary m-1">Submit</button>
+    </form>
+</div>
+<hr>
+<div id="recdata">
+
+</div>
+<script>
+    $('.cb-value').click(function () {
+        var mainParent = $(this).parent('.toggle-btn');
+        if ($(mainParent).find('input.cb-value').is(':checked')) {
+            $("#flexSwitchCheckChecked").val("on");
+        } else {
+            $("#flexSwitchCheckChecked").val("off");
+        }
+
+    })
+    $('#submitinfo').submit(function (event) {
+        $("#recdata").empty();
+        event.preventDefault();
+        var formdata = {
+            'CRIM': $('input[name=CRIM]').val(),
+            'ZN': $('input[name=ZN]').val(),
+            'INDUS': $('input[name=INDUS]').val(),
+            'CHAS': $('input[name=CHAS]').val(),
+            'NOX': $('input[name=NOX]').val(),
+            'RM': $('input[name=RM]').val(),
+            'AGE': $('input[name=AGE]').val(),
+            'DIS': $('input[name=DIS]').val(),
+            'RAD': $('input[name=RAD]').val(),
+            'TAX': $('input[name=TAX]').val(),
+            'PTRATIO': $('input[name=PTRATIO]').val(),
+            'B': $('input[name=B]').val(),
+            'LSTAT': $('input[name=LSTAT]').val(),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+        $.ajax({
+                type: "POST",
+                url: '/',
+                data: formdata,
+                encode: true
+            })
+            .done(function (data) {
+                console.log('positive', data)
+                usdamount = data * 1000
+                inramount = data * 1000 * 75
+                mystr = `<div class="container-fluid">
+                            <h3 class="text-dark mb-1">Price</h3>
+                </div>
+                <div class="container">
+                            <strong><span>Predicted Price(USD):</span> $ ${usdamount}</strong>
+                            <strong style="display: block;"><span>Predicted Price(INR):</span> ₹ ${inramount}</strong>
+                            </div>`
+                $("#recdata").append(mystr);
+            });
+    });
+</script>
+{% endblock body %}
